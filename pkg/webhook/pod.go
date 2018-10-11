@@ -1,0 +1,65 @@
+package webhook
+
+import (
+	//"bufio"
+	//"bytes"
+	"context"
+	"fmt"
+	"github.com/slok/kubewebhook/pkg/log"
+	"github.com/slok/kubewebhook/pkg/observability/metrics"
+	"github.com/slok/kubewebhook/pkg/webhook"
+	"github.com/slok/kubewebhook/pkg/webhook/validating"
+	"github.com/santiagotorres/kubectl-in-toto/pkg/in_toto"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	//kjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
+    //	"k8s.io/client-go/kubernetes/scheme"
+)
+
+// podValidator validates the definition against the Kubesec.io score.
+type PodValidator struct {
+	Logger   log.Logger
+}
+
+func (d *PodValidator) Validate(_ context.Context, obj metav1.Object) (bool, validating.ValidatorResult, error) {
+	kObj, ok := obj.(*v1.Pod)
+	if !ok {
+		return false, validating.ValidatorResult{Valid: true}, nil
+	}
+
+	kObj.TypeMeta = metav1.TypeMeta{
+		Kind:       "Pod",
+		APIVersion: "v1",
+	}
+
+    d.Logger.Infof("Scanning containers in pod: %s", kObj.Name)
+
+    var container v1.Container;
+    for i := range kObj.Spec.Containers {
+        container = kObj.Spec.Containers[i];
+        fmt.Printf("Scanning %v\n", container.Image)
+        _, err := in_toto.NewClient().ScanContainer()
+        if err != nil {
+            d.Logger.Errorf("kubesec.io scan failed %v", err)
+            return false, validating.ValidatorResult{Valid: true}, nil
+        }
+    }
+
+	return true, validating.ValidatorResult{Valid: true}, nil
+}
+
+// NewPodWebhook returns a new deployment validating webhook.
+func NewPodWebhook(minScore int, mrec metrics.Recorder, logger log.Logger) (webhook.Webhook, error) {
+
+	// Create validators.
+	val := &PodValidator{
+		Logger:   logger,
+	}
+
+	cfg := validating.WebhookConfig{
+		Name: "in-toto-pod",
+		Obj:  &v1.Pod{},
+	}
+
+	return validating.NewWebhook(cfg, val, mrec, logger)
+}
