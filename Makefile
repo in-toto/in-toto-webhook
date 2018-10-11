@@ -45,7 +45,7 @@ exportcerts:
 
 testserialize:
 	curl -k https://localhost:8080/links/somerepo/package.2f89b927.link \
-		-d package.2f89b927.link
+		-d test/package.2f89b927.link
 
 binary:
 	go build -a -o in-toto ./cmd/in-toto
