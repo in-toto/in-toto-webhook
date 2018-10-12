@@ -2,11 +2,12 @@ package metadatastore
 
 import (
 	"fmt"
-	"strings"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+    "path/filepath"
+    "path"
 
 	// utility that should go away
 	"net/http/httputil"
@@ -36,15 +37,23 @@ func parseURI (location *url.URL) (string, string) {
 
 	linkName := ""
 	namespace := ""
+    base := "/links"
 
-	requesturi := location.RequestURI()
+	requestUri := location.RequestURI()
+    normalizedPath, err := filepath.Rel(base, requestUri)
+    if err != nil {
+        // FIXME: we should be floating errors upwards here...
+        panic(fmt.Sprintf("The couldn't compute the base properly: %v", err))
+    }
 
-	fields := strings.Split(requesturi, "/")
-	if len(fields) != 4 {
-		fmt.Printf("proper error handling is in order here%v", fields)
-	}
-	linkName = fields[3]
-	namespace = fields[2]
+    namespace, linkName = path.Split(normalizedPath)
+
+// I completely misunderstood this function, but I want to avoid infinite namespaces. FIXME
+////fields := filepath.SplitList(namespace)
+////if len(fields) != 1 {
+////    // FIXME: we should be floating errors upwards here...
+////    panic(fmt.Sprintf("this namespace seems to be wrong: %v", len(fields)))
+////}
 
 	return linkName, namespace
 

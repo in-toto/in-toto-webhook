@@ -1,8 +1,6 @@
 package webhook
 
 import (
-	//"bufio"
-	//"bytes"
 	"context"
 	"fmt"
 	"github.com/slok/kubewebhook/pkg/log"
@@ -12,8 +10,6 @@ import (
 	"github.com/santiagotorres/kubectl-in-toto/pkg/in_toto"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	//kjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
-    //	"k8s.io/client-go/kubernetes/scheme"
 )
 
 // podValidator validates the definition against the Kubesec.io score.
@@ -38,9 +34,13 @@ func (d *PodValidator) Validate(_ context.Context, obj metav1.Object) (bool, val
     for i := range kObj.Spec.Containers {
         container = kObj.Spec.Containers[i];
         fmt.Printf("Scanning %v\n", container.Image)
-        _, err := in_toto.NewClient().ScanContainer()
+        result, err := in_toto.NewClient().ScanContainer(container.Image)
         if err != nil {
-            d.Logger.Errorf("kubesec.io scan failed %v", err)
+            d.Logger.Errorf("in-toto scan scan failed %v", err)
+            return false, validating.ValidatorResult{Valid: true}, nil
+        }
+        if result.Retval != 0 {
+            d.Logger.Errorf("in-toto scan scan failed %v", result.Error)
             return false, validating.ValidatorResult{Valid: true}, nil
         }
     }

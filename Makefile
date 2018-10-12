@@ -44,7 +44,7 @@ exportcerts:
 	grep 'cert.pem' deploy/webhook-certs.yaml | awk '{print $2}' | base64 -d > certs/cert.pem
 
 testserialize:
-	curl -k https://localhost:8080/links/somerepo/package.2f89b927.link \
+	curl -k https://localhost:8080/links/someorganization/someimage/package.2f89b927.link \
 		-d test/package.2f89b927.link
 
 binary:
