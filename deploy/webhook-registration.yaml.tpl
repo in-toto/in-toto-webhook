@@ -2,16 +2,16 @@
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: kubesec-webhook
+  name: in-toto-webhook
   labels:
-    app: kubesec-webhook
+    app: in-toto-webhook
     kind: validator
 webhooks:
-  - name: deployment.admission.kubesc.io
+  - name: deployment.admission.intoto.io
     clientConfig:
       service:
-        name: kubesec-webhook
-        namespace: kubesec
+        name: in-toto-webhook
+        namespace: in-toto
         path: "/deployment"
       caBundle: CA_BUNDLE
     rules:
@@ -28,12 +28,12 @@ webhooks:
     failurePolicy: Fail
     namespaceSelector:
       matchLabels:
-        kubesec-validation: enabled
-  - name: daemonset.admission.kubesc.io
+        in-toto-validation: enabled
+  - name: daemonset.admission.intoto.io
     clientConfig:
       service:
-        name: kubesec-webhook
-        namespace: kubesec
+        name: in-toto-webhook
+        namespace: in-toto
         path: "/daemonset"
       caBundle: CA_BUNDLE
     rules:
@@ -50,12 +50,12 @@ webhooks:
     failurePolicy: Fail
     namespaceSelector:
       matchLabels:
-        kubesec-validation: enabled
-  - name: statefulset.admission.kubesc.io
+        in-toto-validation: enabled
+  - name: statefulset.admission.intoto.io
     clientConfig:
       service:
-        name: kubesec-webhook
-        namespace: kubesec
+        name: in-toto-webhook
+        namespace: in-toto
         path: "/statefulset"
       caBundle: CA_BUNDLE
     rules:
@@ -70,4 +70,4 @@ webhooks:
     failurePolicy: Fail
     namespaceSelector:
       matchLabels:
-        kubesec-validation: enabled
+        in-toto-validation: enabled

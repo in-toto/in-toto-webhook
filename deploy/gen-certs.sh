@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Defaults
-NAMESPACE=${1:-"kubesec"}
-NAME=${2:-"kubesec-webhook"}
+NAMESPACE=${1:-"in-toto"}
+NAME=${2:-"in-toto-webhook"}
 OS="`uname`"
 
 # Generate cert
