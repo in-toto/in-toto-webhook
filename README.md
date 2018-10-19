@@ -17,7 +17,7 @@ Deploy the admission controller and webhooks in the in-toto namespace (requires 
 make deploy
 ``` 
 
-Enable Kubesec validation by adding this label:
+Enable in-toto validation by adding this label:
 
 ```bash
 kubectl label namespaces default in-toto-validation=enabled
@@ -57,7 +57,7 @@ statefulset-test score is -30, deployment minimum accepted score is 0
 
 ### Configuration
 
-You can set the minimum Kubesec.io score in `./deploy/webhook/yaml`:
+Configuration goes in `./deploy/webhook/yaml`:
 
 ```yaml
 apiVersion: apps/v1beta1
