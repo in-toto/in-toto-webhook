@@ -11,7 +11,7 @@ openssl req -new -key ./webhookCA.key -subj "/CN=${NAME}.${NAMESPACE}.svc" -out 
 openssl x509 -req -days 365 -in webhookCA.csr -signkey webhookCA.key -out webhook.crt
 
 # Generate cert secret
-kubectl -n kubesec create secret generic \
+kubectl -n in-toto create secret generic \
     ${NAME}-certs \
     --from-file=key.pem=./webhookCA.key \
     --from-file=cert.pem=./webhook.crt \
