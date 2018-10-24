@@ -1,5 +1,5 @@
 NAME:=in-toto-webhook
-DOCKER_REPOSITORY:=santiagotorres
+DOCKER_REPOSITORY:=controlplane
 DOCKER_IMAGE_NAME:=$(DOCKER_REPOSITORY)/$(NAME)
 GITREPO:=github.com/santiagotorres/in-toto-webhook
 GITCOMMIT:=$(shell git describe --dirty --always)
@@ -23,7 +23,7 @@ certs:
 
 .PHONY: deploy
 deploy:
-	kubectl create namespace in-toto
+	-kubectl create namespace in-toto
 	kubectl apply -f ./deploy/
 
 .PHONY: delete
